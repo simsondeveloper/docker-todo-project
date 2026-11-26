@@ -59,7 +59,7 @@ Stop containers:
 ## Docker Hub Images
 
 Frontend:
-gausu60/todo-frontend:1.0
+simson1009/todo-frontend:1.0
 
 Backend:
-gausu60/todo-backend:1.0
+simson1009/todo-backend:1.0
