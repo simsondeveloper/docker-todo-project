@@ -1,0 +1,60 @@
+services:
+  frontend:
+    image: simson1009/todo-frontend:1.0
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: todo_frontend
+    ports:
+      - "3000:3000"
+    environment:
+      FLASK_API: http://backend:5000
+    depends_on:
+      backend:
+        condition: service_started
+    networks:
+      - todo_network
+    restart: unless-stopped
+
+  backend:
+    image: simson1009/todo-backend:1.0
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: todo_backend
+    ports:
+      - "5000:5000"
+    environment:
+      MONGO_URI: mongodb://mongodb:27017/
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - todo_network
+    restart: unless-stopped
+
+  mongodb:
+    image: mongo:8
+    container_name: todo_mongodb
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - todo_network
+    healthcheck:
+      test:
+        - CMD
+        - mongosh
+        - --quiet
+        - --eval
+        - "db.adminCommand('ping').ok"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+networks:
+  todo_network:
+    driver: bridge
+
+volumes:
+  mongo_data:
